@@ -43,8 +43,8 @@ do
 done
 printf "\n%s\n"  "Knoten ist online im Config Mode"
 echo "--------------------------------------------" >> nodes.txt
-ip address show eth0 | grep -Eo [:0-9a-f:]{2}\(\:[:0-9a-f:]{2}\){5} >> nodes.txt
-ip address show br-client | sed -e's/^.*inet6 \([^ ]*\)\/.*$/\1/;t;d' >> nodes.txt
+sshpass ssh root@192.168.1.1 'ip address show eth0 | grep -Eo [:0-9a-f:]{2}\(\:[:0-9a-f:]{2}\){5}' >> nodes.txt
+sshpass ssh root@192.168.1.1 'ip address show br-client | sed -e's/^.*inet6 \([^ ]*\)\/.*$/\1/;t;d'' >> nodes.txt
 echo "Schreibe SSH Key und Antennen-Offsets"
 cat public_rsa_key.pub | sshpass ssh root@192.168.1.1 'cat >> /etc/dropbear/authorized_keys'
 sshpass ssh root@192.168.1.1 'uci set wireless.radio0.txpower=17'
@@ -91,8 +91,8 @@ do
 done
 printf "\n%s\n"  "Knoten ist online im Config Mode"
 echo "--------------------------------------------" >> nodes.txt
-ip address show eth0 | grep -Eo [:0-9a-f:]{2}\(\:[:0-9a-f:]{2}\){5} >> nodes.txt
-ip address show br-client | sed -e's/^.*inet6 \([^ ]*\)\/.*$/\1/;t;d' >> nodes.txt
+sshpass ssh root@192.168.1.1 'ip address show eth0 | grep -Eo [:0-9a-f:]{2}\(\:[:0-9a-f:]{2}\){5}' >> nodes.txt
+sshpass ssh root@192.168.1.1 'ip address show br-client | sed -e's/^.*inet6 \([^ ]*\)\/.*$/\1/;t;d'' >> nodes.txt
 echo "Schreibe SSH Key und Antennen-Offsets"
 cat public_rsa_key.pub | sshpass ssh root@192.168.1.1 'cat >> /etc/dropbear/authorized_keys'
 sshpass ssh root@192.168.1.1 'uci set wireless.radio0.txpower=17'
@@ -137,8 +137,8 @@ do
 done
 printf "\n%s\n"  "Knoten ist online im Config Mode"
 echo "--------------------------------------------" >> nodes.txt
-ip address show eth0 | grep -Eo [:0-9a-f:]{2}\(\:[:0-9a-f:]{2}\){5} >> nodes.txt
-ip address show br-client | sed -e's/^.*inet6 \([^ ]*\)\/.*$/\1/;t;d' >> nodes.txt
+sshpass ssh root@192.168.1.1 'ip address show eth0 | grep -Eo [:0-9a-f:]{2}\(\:[:0-9a-f:]{2}\){5}' >> nodes.txt
+sshpass ssh root@192.168.1.1 'ip address show br-client | sed -e's/^.*inet6 \([^ ]*\)\/.*$/\1/;t;d'' >> nodes.txt
 echo "Schreibe SSH Key und Antennen-Offsets"
 cat public_rsa_key.pub | sshpass ssh root@192.168.1.1 'cat >> /etc/dropbear/authorized_keys'
 sshpass ssh root@192.168.1.1 'uci set wireless.radio0.txpower=12'
