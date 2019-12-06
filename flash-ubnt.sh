@@ -30,7 +30,7 @@ read -n 1 TASTE
 sshpass -p 'ubnt' scp aclite.bin ubnt@192.168.1.20:/tmp 
 sshpass -p 'ubnt' ssh ubnt@192.168.1.20 'mtd write /tmp/aclite.bin kernel0'
 sshpass -p 'ubnt' ssh ubnt@192.168.1.20 'mtd write /tmp/aclite.bin kernel1'
-sshpass -p 'ubnt' ssh ubnt@192.168.1.20 'dd if=/dev/zero bs=1 count=1 of=/dev/mtd4'
+sshpass -p 'ubnt' ssh ubnt@192.168.1.20 'dd if=/dev/zero bs=1 count=1 of=/dev/mtd$(cat /proc/mtd|grep bs|cut -c4)'
 sshpass -p 'ubnt' ssh ubnt@192.168.1.20 'reboot'
 echo
 echo "Der AP bootet nun und wird zur weiteren Konfiguration in Kürze "
@@ -78,7 +78,7 @@ read -n 1 TASTE
 sshpass -p 'ubnt' scp acmesh.bin ubnt@192.168.1.20:/tmp 
 sshpass -p 'ubnt' ssh ubnt@192.168.1.20 'mtd write /tmp/acmesh.bin kernel0'
 sshpass -p 'ubnt' ssh ubnt@192.168.1.20 'mtd write /tmp/acmesh.bin kernel1'
-sshpass -p 'ubnt' ssh ubnt@192.168.1.20 'dd if=/dev/zero bs=1 count=1 of=/dev/mtd4'
+sshpass -p 'ubnt' ssh ubnt@192.168.1.20 'dd if=/dev/zero bs=1 count=1 of=/dev/mtd$(cat /proc/mtd|grep bs|cut -c4)'
 sshpass -p 'ubnt' ssh ubnt@192.168.1.20 'reboot'
 echo
 echo "Der AP bootet nun und wird zur weiteren Konfiguration in Kürze "
@@ -124,7 +124,7 @@ read -n 1 TASTE
 sshpass -p 'ubnt' scp acmeshpro.bin ubnt@192.168.1.20:/tmp 
 sshpass -p 'ubnt' ssh ubnt@192.168.1.20 'mtd write /tmp/acmesh.bin kernel0'
 sshpass -p 'ubnt' ssh ubnt@192.168.1.20 'mtd write /tmp/acmesh.bin kernel1'
-sshpass -p 'ubnt' ssh ubnt@192.168.1.20 'dd if=/dev/zero bs=1 count=1 of=/dev/mtd4'
+sshpass -p 'ubnt' ssh ubnt@192.168.1.20 'dd if=/dev/zero bs=1 count=1 of=/dev/mtd$(cat /proc/mtd|grep bs|cut -c4)'
 sshpass -p 'ubnt' ssh ubnt@192.168.1.20 'reboot'
 echo
 echo "Der AP bootet nun und wird zur weiteren Konfiguration in Kürze "
