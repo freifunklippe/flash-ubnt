@@ -8,7 +8,6 @@
 # functions
 
 flashaclite() {
-ifconfig eth0:0 192.168.1.254 netmask 255.255.255.0 up
 echo
 echo "Der SSH-Key wird nun aktualisiert"
 echo "-------------"
@@ -43,20 +42,19 @@ do
 done
 printf "\n%s\n"  "Knoten ist online im Config Mode"
 echo "--------------------------------------------" >> nodes.txt
-sshpass ssh root@192.168.1.1 'ip address show eth0 | grep -Eo [:0-9a-f:]{2}\(\:[:0-9a-f:]{2}\){5}' >> nodes.txt
-sshpass ssh root@192.168.1.1 'ip address show br-client | sed -e's/^.*inet6 \([^ ]*\)\/.*$/\1/;t;d'' >> nodes.txt
+sshpass -p '' ssh root@192.168.1.1 'ip address show eth0 | grep -Eo [:0-9a-f:]{2}\(\:[:0-9a-f:]{2}\){5}' >> nodes.txt
+sshpass -p '' ssh root@192.168.1.1 'ip address show br-client | sed -e's/^.*inet6 \([^ ]*\)\/.*$/\1/;t;d'' >> nodes.txt
 echo "Schreibe SSH Key und Antennen-Offsets"
 cat public_rsa_key.pub | sshpass ssh root@192.168.1.1 'cat >> /etc/dropbear/authorized_keys'
-sshpass ssh root@192.168.1.1 'uci set wireless.radio0.txpower=17'
-sshpass ssh root@192.168.1.1 'uci set wireless.radio1.txpower=14'
-sshpass ssh root@192.168.1.1 'uci commit wireless'
-sshpass ssh root@192.168.1.1 'wifi'
+sshpass -p ''  ssh root@192.168.1.1 'uci set wireless.radio0.txpower=17'
+sshpass -p '' ssh root@192.168.1.1 'uci set wireless.radio1.txpower=14'
+sshpass -p '' ssh root@192.168.1.1 'uci commit wireless'
+sshpass -p '' ssh root@192.168.1.1 'wifi'
 }
 
 
 
 flashacmesh() {
-ifconfig eth0:0 192.168.1.254 netmask 255.255.255.0 up
 echo
 echo "Der SSH-Key wird nun aktualisiert"
 echo "-------------"
@@ -102,7 +100,6 @@ sshpass ssh root@192.168.1.1 'wifi'
 }
 
 flashacmeshpro() {
-ifconfig eth0:0 192.168.1.254 netmask 255.255.255.0 up
 echo
 echo "Der SSH-Key wird nun aktualisiert"
 echo "-------------"
