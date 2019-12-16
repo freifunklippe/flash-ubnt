@@ -46,10 +46,6 @@ sshpass -p '' ssh root@192.168.1.1 'ip address show eth0 | grep -Eo [:0-9a-f:]{2
 sshpass -p '' ssh root@192.168.1.1 'ip address show br-client | sed -e's/^.*inet6 \([^ ]*\)\/.*$/\1/;t;d'' >> nodes.txt
 echo "Schreibe SSH Key und Antennen-Offsets"
 cat public_rsa_key.pub | sshpass ssh root@192.168.1.1 'cat >> /etc/dropbear/authorized_keys'
-sshpass -p ''  ssh root@192.168.1.1 'uci set wireless.radio0.txpower=17'
-sshpass -p '' ssh root@192.168.1.1 'uci set wireless.radio1.txpower=14'
-sshpass -p '' ssh root@192.168.1.1 'uci commit wireless'
-sshpass -p '' ssh root@192.168.1.1 'wifi'
 }
 
 
@@ -93,10 +89,6 @@ sshpass ssh root@192.168.1.1 'ip address show eth0 | grep -Eo [:0-9a-f:]{2}\(\:[
 sshpass ssh root@192.168.1.1 'ip address show br-client | sed -e's/^.*inet6 \([^ ]*\)\/.*$/\1/;t;d'' >> nodes.txt
 echo "Schreibe SSH Key und Antennen-Offsets"
 cat public_rsa_key.pub | sshpass ssh root@192.168.1.1 'cat >> /etc/dropbear/authorized_keys'
-sshpass ssh root@192.168.1.1 'uci set wireless.radio0.txpower=17'
-sshpass ssh root@192.168.1.1 'uci set wireless.radio1.txpower=14'
-sshpass ssh root@192.168.1.1 'uci commit wireless'
-sshpass ssh root@192.168.1.1 'wifi'
 }
 
 flashacmeshpro() {
@@ -138,10 +130,6 @@ sshpass ssh root@192.168.1.1 'ip address show eth0 | grep -Eo [:0-9a-f:]{2}\(\:[
 sshpass ssh root@192.168.1.1 'ip address show br-client | sed -e's/^.*inet6 \([^ ]*\)\/.*$/\1/;t;d'' >> nodes.txt
 echo "Schreibe SSH Key und Antennen-Offsets"
 cat public_rsa_key.pub | sshpass ssh root@192.168.1.1 'cat >> /etc/dropbear/authorized_keys'
-sshpass ssh root@192.168.1.1 'uci set wireless.radio0.txpower=12'
-sshpass ssh root@192.168.1.1 'uci set wireless.radio1.txpower=12'
-sshpass ssh root@192.168.1.1 'uci commit wireless'
-sshpass ssh root@192.168.1.1 'wifi'
 }
 
 # main
