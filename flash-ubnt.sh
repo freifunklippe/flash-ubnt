@@ -4,7 +4,6 @@
 # License: GPLv3
 # by Collimas / www.freifunk-lippe.de / mb@freifunk-lippe.de
 # Requirements: package 'sshpass' needs to be installed -> 'sudo apt install sshpass'
-# Script needs to be executed with sudo privileges!
 
 # functions
 
@@ -43,8 +42,9 @@ do
 done
 printf "\n%s\n"  "Knoten ist online im Config Mode"
 echo "--------------------------------------------" >> nodes.txt
-sshpass ssh root@192.168.1.1 'ip address show eth0 | grep -Eo [:0-9a-f:]{2}\(\:[:0-9a-f:]{2}\){5}' >> nodes.txt
-echo "Schreibe SSH Key"
+sshpass -p '' ssh root@192.168.1.1 'ip address show eth0 | grep -Eo [:0-9a-f:]{2}\(\:[:0-9a-f:]{2}\){5}' >> nodes.txt
+sshpass -p '' ssh root@192.168.1.1 'ip address show br-client | sed -e's/^.*inet6 \([^ ]*\)\/.*$/\1/;t;d'' >> nodes.txt
+echo "Schreibe SSH Key und Antennen-Offsets"
 cat public_rsa_key.pub | sshpass ssh root@192.168.1.1 'cat >> /etc/dropbear/authorized_keys'
 }
 
@@ -86,7 +86,8 @@ done
 printf "\n%s\n"  "Knoten ist online im Config Mode"
 echo "--------------------------------------------" >> nodes.txt
 sshpass ssh root@192.168.1.1 'ip address show eth0 | grep -Eo [:0-9a-f:]{2}\(\:[:0-9a-f:]{2}\){5}' >> nodes.txt
-echo "Schreibe SSH Key"
+sshpass ssh root@192.168.1.1 'ip address show br-client | sed -e's/^.*inet6 \([^ ]*\)\/.*$/\1/;t;d'' >> nodes.txt
+echo "Schreibe SSH Key und Antennen-Offsets"
 cat public_rsa_key.pub | sshpass ssh root@192.168.1.1 'cat >> /etc/dropbear/authorized_keys'
 }
 
@@ -126,7 +127,8 @@ done
 printf "\n%s\n"  "Knoten ist online im Config Mode"
 echo "--------------------------------------------" >> nodes.txt
 sshpass ssh root@192.168.1.1 'ip address show eth0 | grep -Eo [:0-9a-f:]{2}\(\:[:0-9a-f:]{2}\){5}' >> nodes.txt
-echo "Schreibe SSH Key"
+sshpass ssh root@192.168.1.1 'ip address show br-client | sed -e's/^.*inet6 \([^ ]*\)\/.*$/\1/;t;d'' >> nodes.txt
+echo "Schreibe SSH Key und Antennen-Offsets"
 cat public_rsa_key.pub | sshpass ssh root@192.168.1.1 'cat >> /etc/dropbear/authorized_keys'
 }
 
@@ -137,16 +139,11 @@ echo "======================================================================="
 echo
 echo "Bitte diesen PC unter der IP-Adresse 192.168.1.20/24 erreichbar"
 echo "machen und Ubiquiti Hardware mit dem Netzwerk verbinden."
-echo "Der Netzwerkschnittstelle eth0 wird automatisch eine Adresse aus"
-echo "diesem Subnet hinzugefügt."
 echo
 echo "Die zu flashende Firmware muss unter dem Dateinamen acmesh.bin,"
 echo "acmeshpro.bin oder aclite.bin im Verzeichnis dieses Scriptes liegen."
-echo "Die notwendigen Images werden jetzt automatisch heruntergeladen."
 echo
 echo
-wget -nc http://download.freifunk-lippe.de/flash-ubnt/*.*
-ifconfig eth0:0 192.168.1.254 netmask 255.255.255.0 up
 PS3='Bitte wählen: '
 options=("Flashen AC Lite" "Flashen AC Mesh" "Flashen AC Mesh Pro" "Beenden")
 select opt in "${options[@]}"
