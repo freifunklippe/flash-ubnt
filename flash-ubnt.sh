@@ -53,6 +53,7 @@ cat public_rsa_key.pub | sshpass ssh root@192.168.1.1 'cat >> /etc/dropbear/auth
 flashacmesh() {
 echo
 echo "Der SSH-Key wird nun aktualisiert"
+read -p "Press enter to continue"
 echo "-------------"
 ssh-keygen -f "/home/$USER/.ssh/known_hosts" -R "192.168.1.20"
 ssh-keyscan "192.168.1.20" >> "/home/$USER/.ssh/known_hosts"
