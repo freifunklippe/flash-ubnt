@@ -64,16 +64,22 @@ echo
 echo "Aktuelle Version des AP:"
 sshpass -p 'ubnt' ssh ubnt@192.168.1.20 'cat /etc/version'
 echo
-echo "Obige Version muss 3.7.58 oder 3.8.3 sein. Wenn eine andere"
-echo "Versionsnummer angezeigt wird, NICHT flashen !"
+echo "Obige Version muss 3.7.58, 3.8.3 oder 3.9.54 sein. Wenn"
+echo "eine andere Versionsnummer angezeigt wird, NICHT flashen !"
 echo
 echo "Beliebige Taste drücken - flashen" 
 echo "STRG+C - Script abbrechen"
 read -n 1 TASTE
-sshpass -p 'ubnt' scp acmesh.bin ubnt@192.168.1.20:/tmp 
+echo "Lade Firmware..."
+wget "http://download.freifunk-lippe.de/flash-ubnt/acmesh.bin"
+sshpass -p 'ubnt' scp acmesh.bin ubnt@192.168.1.20:/tmp
+read -p "Press enter to continue"
 sshpass -p 'ubnt' ssh ubnt@192.168.1.20 'mtd write /tmp/acmesh.bin kernel0'
+read -p "Press enter to continue"
 sshpass -p 'ubnt' ssh ubnt@192.168.1.20 'mtd write /tmp/acmesh.bin kernel1'
+read -p "Press enter to continue"
 sshpass -p 'ubnt' ssh ubnt@192.168.1.20 'dd if=/dev/zero bs=1 count=1 of=/dev/mtd$(cat /proc/mtd|grep bs|cut -c4)'
+read -p "Press enter to continue"
 sshpass -p 'ubnt' ssh ubnt@192.168.1.20 'reboot'
 echo
 echo "Der AP bootet nun und wird zur weiteren Konfiguration in Kürze "
@@ -86,10 +92,30 @@ do
 done
 printf "\n%s\n"  "Knoten ist online im Config Mode"
 echo "--------------------------------------------" >> nodes.txt
+read -p "Press enter to continue"
 sshpass ssh root@192.168.1.1 'ip address show eth0 | grep -Eo [:0-9a-f:]{2}\(\:[:0-9a-f:]{2}\){5}' >> nodes.txt
+read -p "Press enter to continue"
 sshpass ssh root@192.168.1.1 'ip address show br-client | sed -e's/^.*inet6 \([^ ]*\)\/.*$/\1/;t;d'' >> nodes.txt
-echo "Schreibe SSH Key und Antennen-Offsets"
+read -p "Press enter to continue"
+echo "Bitte Knoten-Namen eingeben"
+read nname
+echo "Bitte Domaincode eingeben"
+read dmc
+echo "Schreibe SSH Key und Knoteninfos"
 cat public_rsa_key.pub | sshpass ssh root@192.168.1.1 'cat >> /etc/dropbear/authorized_keys'
+read -p "Press enter to continue"
+sshpass ssh root@192.168.1.1 'pretty-hostname $nname'
+read -p "Press enter to continue"
+sshpass ssh root@192.168.1.1 'pretty-hostname $nname'
+read -p "Press enter to continue"
+sshpass ssh root@192.168.1.1 'uci set gluon-node-info.@owner[0].contact=info@freifunk-lippe.de'
+sshpass ssh root@192.168.1.1 'uci commit gluon-node-info'
+read -p "Press enter to continue"
+sshpass ssh root@192.168.1.1 'uci set gluon.core.domain=$dmc'
+sshpass ssh root@192.168.1.1 'uci commit'
+read -p "Press enter to continue"
+echo "Knoten ist fertig geflasht und rebootet nun."
+sshpass ssh root@192.168.1.1 'reboot'
 }
 
 flashacmeshpro() {
