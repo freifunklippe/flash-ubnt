@@ -15,22 +15,15 @@ ssh-keygen -f "/home/$USER/.ssh/known_hosts" -R "192.168.1.20"
 ssh-keyscan "192.168.1.20" >> "/home/$USER/.ssh/known_hosts"
 echo "-------------"
 echo "SSH-Key aktualisiert"
-echo
-echo
-echo "Aktuelle Version des AP:"
-sshpass -p 'ubnt' ssh ubnt@192.168.1.20 'cat /etc/version'
-echo
-echo "Obige Version muss 3.7.58 oder 3.8.3 sein. Wenn eine andere"
-echo "Versionsnummer angezeigt wird, NICHT flashen !"
-echo
-echo "Beliebige Taste drücken - flashen" 
-echo "STRG+C - Script abbrechen"
-read -n 1 TASTE
-sshpass -p 'ubnt' scp aclite.bin ubnt@192.168.1.20:/tmp 
-sshpass -p 'ubnt' ssh ubnt@192.168.1.20 'mtd write /tmp/aclite.bin kernel0'
-sshpass -p 'ubnt' ssh ubnt@192.168.1.20 'mtd write /tmp/aclite.bin kernel1'
-sshpass -p 'ubnt' ssh ubnt@192.168.1.20 'dd if=/dev/zero bs=1 count=1 of=/dev/mtd$(cat /proc/mtd|grep bs|cut -c4)'
-sshpass -p 'ubnt' ssh ubnt@192.168.1.20 'reboot'
+echo "Kopiere mtd..."
+sshpass -p 'ubnt' scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null mtd ubnt@192.168.1.20:/bin
+echo "Lade Firmware"
+wget -N "http://download.freifunk-lippe.de/flash-ubnt/aclite.bin"
+sshpass -p 'ubnt' scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null aclite.bin ubnt@192.168.1.20:/tmp
+sshpass -p 'ubnt' ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ubnt@192.168.1.20 'mtd write /tmp/aclite.bin kernel0'
+sshpass -p 'ubnt' ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ubnt@192.168.1.20 'mtd write /tmp/aclite.bin kernel1'
+sshpass -p 'ubnt' ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ubnt@192.168.1.20 'dd if=/dev/zero bs=1 count=1 of=/dev/mtd$(cat /proc/mtd|grep bs|cut -c4)'
+sshpass -p 'ubnt' ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ubnt@192.168.1.20 'reboot'
 echo
 echo "Der AP bootet nun und wird zur weiteren Konfiguration in Kürze "
 echo "unter 192.168.1.1 erreichbar sein."
@@ -41,14 +34,24 @@ do
     printf "%c" "."
 done
 printf "\n%s\n"  "Knoten ist online im Config Mode"
+echo "30 Sekunden warten..."
+sleep 30
 echo "--------------------------------------------" >> nodes.txt
-sshpass -p '' ssh root@192.168.1.1 'ip address show eth0 | grep -Eo [:0-9a-f:]{2}\(\:[:0-9a-f:]{2}\){5}' >> nodes.txt
-sshpass -p '' ssh root@192.168.1.1 'ip address show br-client | sed -e's/^.*inet6 \([^ ]*\)\/.*$/\1/;t;d'' >> nodes.txt
-echo "Schreibe SSH Key und Antennen-Offsets"
-cat public_rsa_key.pub | sshpass ssh root@192.168.1.1 'cat >> /etc/dropbear/authorized_keys'
+sshpass ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@192.168.1.1 'ip address show eth0 | grep -Eo [:0-9a-f:]{2}\(\:[:0-9a-f:]{2}\){5}' >> nodes.txt
+echo "Schreibe SSH Key und Knoteninfos"
+cat public_rsa_key.pub | sshpass ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@192.168.1.1 'cat >> /etc/dropbear/authorized_keys'
+sshpass ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@192.168.1.1 'pretty-hostname FFBSU'
+sshpass ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@192.168.1.1 'uci set gluon-node-info.@owner[0].contact=info@freifunk-lippe.de'
+sshpass ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@192.168.1.1 'uci commit gluon-node-info'
+sshpass ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@192.168.1.1 'uci set gluon.core.domain=d4low'
+sshpass ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@192.168.1.1 'uci commit'
+sshpass ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@192.168.1.1 'gluon-reconfigure'
+sshpass ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@192.168.1.1 'uci set gluon-setup-mode.@setup_mode[0].configured=1'
+sshpass ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@192.168.1.1 'uci commit gluon-setup-mode'
+echo "Knoten ist fertig geflasht und rebootet nun."
+sshpass ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@192.168.1.1 'reboot'
+read -n 1 TASTE
 }
-
-
 
 flashacmesh() {
 echo
@@ -58,22 +61,15 @@ ssh-keygen -f "/home/$USER/.ssh/known_hosts" -R "192.168.1.20"
 ssh-keyscan "192.168.1.20" >> "/home/$USER/.ssh/known_hosts"
 echo "-------------"
 echo "SSH-Key aktualisiert"
-echo
-echo
-echo "Aktuelle Version des AP:"
-sshpass -p 'ubnt' ssh ubnt@192.168.1.20 'cat /etc/version'
-echo
-echo "Obige Version muss 3.7.58 oder 3.8.3 sein. Wenn eine andere"
-echo "Versionsnummer angezeigt wird, NICHT flashen !"
-echo
-echo "Beliebige Taste drücken - flashen" 
-echo "STRG+C - Script abbrechen"
-read -n 1 TASTE
-sshpass -p 'ubnt' scp acmesh.bin ubnt@192.168.1.20:/tmp 
-sshpass -p 'ubnt' ssh ubnt@192.168.1.20 'mtd write /tmp/acmesh.bin kernel0'
-sshpass -p 'ubnt' ssh ubnt@192.168.1.20 'mtd write /tmp/acmesh.bin kernel1'
-sshpass -p 'ubnt' ssh ubnt@192.168.1.20 'dd if=/dev/zero bs=1 count=1 of=/dev/mtd$(cat /proc/mtd|grep bs|cut -c4)'
-sshpass -p 'ubnt' ssh ubnt@192.168.1.20 'reboot'
+echo "Kopiere mtd..."
+sshpass -p 'ubnt' scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null mtd ubnt@192.168.1.20:/bin
+echo "Lade Firmware"
+wget -N "http://download.freifunk-lippe.de/flash-ubnt/acmesh.bin"
+sshpass -p 'ubnt' scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null acmesh.bin ubnt@192.168.1.20:/tmp
+sshpass -p 'ubnt' ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ubnt@192.168.1.20 'mtd write /tmp/acmesh.bin kernel0'
+sshpass -p 'ubnt' ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ubnt@192.168.1.20 'mtd write /tmp/acmesh.bin kernel1'
+sshpass -p 'ubnt' ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ubnt@192.168.1.20 'dd if=/dev/zero bs=1 count=1 of=/dev/mtd$(cat /proc/mtd|grep bs|cut -c4)'
+sshpass -p 'ubnt' ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ubnt@192.168.1.20 'reboot'
 echo
 echo "Der AP bootet nun und wird zur weiteren Konfiguration in Kürze "
 echo "unter 192.168.1.1 erreichbar sein."
@@ -84,11 +80,23 @@ do
     printf "%c" "."
 done
 printf "\n%s\n"  "Knoten ist online im Config Mode"
+echo "30 Sekunden warten..."
+sleep 30
 echo "--------------------------------------------" >> nodes.txt
-sshpass ssh root@192.168.1.1 'ip address show eth0 | grep -Eo [:0-9a-f:]{2}\(\:[:0-9a-f:]{2}\){5}' >> nodes.txt
-sshpass ssh root@192.168.1.1 'ip address show br-client | sed -e's/^.*inet6 \([^ ]*\)\/.*$/\1/;t;d'' >> nodes.txt
-echo "Schreibe SSH Key und Antennen-Offsets"
-cat public_rsa_key.pub | sshpass ssh root@192.168.1.1 'cat >> /etc/dropbear/authorized_keys'
+sshpass ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@192.168.1.1 'ip address show eth0 | grep -Eo [:0-9a-f:]{2}\(\:[:0-9a-f:]{2}\){5}' >> nodes.txt
+echo "Schreibe SSH Key und Knoteninfos"
+cat public_rsa_key.pub | sshpass ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@192.168.1.1 'cat >> /etc/dropbear/authorized_keys'
+sshpass ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@192.168.1.1 'pretty-hostname FFBSU'
+sshpass ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@192.168.1.1 'uci set gluon-node-info.@owner[0].contact=info@freifunk-lippe.de'
+sshpass ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@192.168.1.1 'uci commit gluon-node-info'
+sshpass ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@192.168.1.1 'uci set gluon.core.domain=d4low'
+sshpass ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@192.168.1.1 'uci commit'
+sshpass ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@192.168.1.1 'gluon-reconfigure'
+sshpass ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@192.168.1.1 'uci set gluon-setup-mode.@setup_mode[0].configured=1'
+sshpass ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@192.168.1.1 'uci commit gluon-setup-mode'
+echo "Knoten ist fertig geflasht und rebootet nun."
+sshpass ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@192.168.1.1 'reboot'
+read -n 1 TASTE
 }
 
 flashacmeshpro() {
@@ -99,22 +107,15 @@ ssh-keygen -f "/home/$USER/.ssh/known_hosts" -R "192.168.1.20"
 ssh-keyscan "192.168.1.20" >> "/home/$USER/.ssh/known_hosts"
 echo "-------------"
 echo "SSH-Key aktualisiert"
-echo
-echo
-echo "Aktuelle Version des AP:"
-sshpass -p 'ubnt' ssh ubnt@192.168.1.20 'cat /etc/version'
-echo
-echo "Obige Version muss 3.7.58 oder 3.8.3 sein. Wenn eine andere"
-echo "Versionsnummer angezeigt wird, NICHT flashen !"
-echo
-echo "Beliebige Taste drücken - flashen" 
-echo "STRG+C - Script abbrechen"
-read -n 1 TASTE
-sshpass -p 'ubnt' scp acmeshpro.bin ubnt@192.168.1.20:/tmp 
-sshpass -p 'ubnt' ssh ubnt@192.168.1.20 'mtd write /tmp/acmesh.bin kernel0'
-sshpass -p 'ubnt' ssh ubnt@192.168.1.20 'mtd write /tmp/acmesh.bin kernel1'
-sshpass -p 'ubnt' ssh ubnt@192.168.1.20 'dd if=/dev/zero bs=1 count=1 of=/dev/mtd$(cat /proc/mtd|grep bs|cut -c4)'
-sshpass -p 'ubnt' ssh ubnt@192.168.1.20 'reboot'
+echo "Kopiere mtd..."
+sshpass -p 'ubnt' scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null mtd ubnt@192.168.1.20:/bin
+echo "Lade Firmware"
+wget -N "http://download.freifunk-lippe.de/flash-ubnt/acmeshpro.bin"
+sshpass -p 'ubnt' scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null acmeshpro.bin ubnt@192.168.1.20:/tmp
+sshpass -p 'ubnt' ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ubnt@192.168.1.20 'mtd write /tmp/acmeshpro.bin kernel0'
+sshpass -p 'ubnt' ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ubnt@192.168.1.20 'mtd write /tmp/acmeshpro.bin kernel1'
+sshpass -p 'ubnt' ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ubnt@192.168.1.20 'dd if=/dev/zero bs=1 count=1 of=/dev/mtd$(cat /proc/mtd|grep bs|cut -c4)'
+sshpass -p 'ubnt' ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ubnt@192.168.1.20 'reboot'
 echo
 echo "Der AP bootet nun und wird zur weiteren Konfiguration in Kürze "
 echo "unter 192.168.1.1 erreichbar sein."
@@ -125,11 +126,23 @@ do
     printf "%c" "."
 done
 printf "\n%s\n"  "Knoten ist online im Config Mode"
+echo "30 Sekunden warten..."
+sleep 30
 echo "--------------------------------------------" >> nodes.txt
-sshpass ssh root@192.168.1.1 'ip address show eth0 | grep -Eo [:0-9a-f:]{2}\(\:[:0-9a-f:]{2}\){5}' >> nodes.txt
-sshpass ssh root@192.168.1.1 'ip address show br-client | sed -e's/^.*inet6 \([^ ]*\)\/.*$/\1/;t;d'' >> nodes.txt
-echo "Schreibe SSH Key und Antennen-Offsets"
-cat public_rsa_key.pub | sshpass ssh root@192.168.1.1 'cat >> /etc/dropbear/authorized_keys'
+sshpass ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@192.168.1.1 'ip address show eth0 | grep -Eo [:0-9a-f:]{2}\(\:[:0-9a-f:]{2}\){5}' >> nodes.txt
+echo "Schreibe SSH Key und Knoteninfos"
+cat public_rsa_key.pub | sshpass ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@192.168.1.1 'cat >> /etc/dropbear/authorized_keys'
+sshpass ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@192.168.1.1 'pretty-hostname FFBSU'
+sshpass ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@192.168.1.1 'uci set gluon-node-info.@owner[0].contact=info@freifunk-lippe.de'
+sshpass ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@192.168.1.1 'uci commit gluon-node-info'
+sshpass ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@192.168.1.1 'uci set gluon.core.domain=d4low'
+sshpass ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@192.168.1.1 'uci commit'
+sshpass ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@192.168.1.1 'gluon-reconfigure'
+sshpass ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@192.168.1.1 'uci set gluon-setup-mode.@setup_mode[0].configured=1'
+sshpass ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@192.168.1.1 'uci commit gluon-setup-mode'
+echo "Knoten ist fertig geflasht und rebootet nun."
+sshpass ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@192.168.1.1 'reboot'
+read -n 1 TASTE
 }
 
 # main
