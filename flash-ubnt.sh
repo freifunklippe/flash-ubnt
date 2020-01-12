@@ -45,12 +45,12 @@ echo "--------------------------------------------" >> nodes.txt
 sshpass ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@192.168.1.1 'ip address show eth0 | grep -Eo [:0-9a-f:]{2}\(\:[:0-9a-f:]{2}\){5}' >> nodes.txt
 echo "Schreibe SSH Key und Knoteninfos"
 cat public_rsa_key.pub | sshpass ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@192.168.1.1 'cat >> /etc/dropbear/authorized_keys'
-read -p "Bitte Knoten-Namen eingeben: " nodename
-read -p "Bitte Domaincode eingeben: " domaincode
-sshpass ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@192.168.1.1 'pretty-hostname "$nodename"'
+# read -p "Bitte Knoten-Namen eingeben: " nodename
+# read -p "Bitte Domaincode eingeben: " domaincode
+sshpass ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@192.168.1.1 'pretty-hostname FFBSU'
 sshpass ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@192.168.1.1 'uci set gluon-node-info.@owner[0].contact=info@freifunk-lippe.de'
 sshpass ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@192.168.1.1 'uci commit gluon-node-info'
-sshpass ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@192.168.1.1 'uci set gluon.core.domain="$domaincode"'
+sshpass ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@192.168.1.1 'uci set gluon.core.domain=d4low'
 sshpass ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@192.168.1.1 'uci commit'
 sshpass ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@192.168.1.1 'gluon-reconfigure'
 sshpass ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@192.168.1.1 'uci set gluon-setup-mode.@setup_mode[0].configured=1'
@@ -94,12 +94,12 @@ echo "--------------------------------------------" >> nodes.txt
 sshpass ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@192.168.1.1 'ip address show eth0 | grep -Eo [:0-9a-f:]{2}\(\:[:0-9a-f:]{2}\){5}' >> nodes.txt
 echo "Schreibe SSH Key und Knoteninfos"
 cat public_rsa_key.pub | sshpass ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@192.168.1.1 'cat >> /etc/dropbear/authorized_keys'
-read -p "Bitte Knoten-Namen eingeben: " nodename
-read -p "Bitte Domaincode eingeben: " domaincode
-sshpass ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@192.168.1.1 'pretty-hostname "$nodename"'
+# read -p "Bitte Knoten-Namen eingeben: " nodename
+# read -p "Bitte Domaincode eingeben: " domaincode
+sshpass ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@192.168.1.1 'pretty-hostname FFBSU'
 sshpass ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@192.168.1.1 'uci set gluon-node-info.@owner[0].contact=info@freifunk-lippe.de'
 sshpass ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@192.168.1.1 'uci commit gluon-node-info'
-sshpass ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@192.168.1.1 'uci set gluon.core.domain="$domaincode"'
+sshpass ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@192.168.1.1 'uci set gluon.core.domain=d4low'
 sshpass ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@192.168.1.1 'uci commit'
 sshpass ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@192.168.1.1 'gluon-reconfigure'
 sshpass ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@192.168.1.1 'uci set gluon-setup-mode.@setup_mode[0].configured=1'
@@ -127,6 +127,7 @@ sshpass -p 'ubnt' ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/nul
 sshpass -p 'ubnt' ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ubnt@192.168.1.20 'mtd write /tmp/acmeshpro.bin kernel1'
 sshpass -p 'ubnt' ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ubnt@192.168.1.20 'dd if=/dev/zero bs=1 count=1 of=/dev/mtd$(cat /proc/mtd|grep bs|cut -c4)'
 sshpass -p 'ubnt' ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ubnt@192.168.1.20 'reboot'
+read -p "Bitte Netzwerkkabel auf den Secondary Port umstecken und ENTER drücken."
 echo
 echo "Der AP bootet nun und wird zur weiteren Konfiguration in Kürze "
 echo "unter 192.168.1.1 erreichbar sein."
@@ -137,18 +138,18 @@ do
     printf "%c" "."
 done
 printf "\n%s\n"  "Knoten ist online im Config Mode"
-echo "30 Sekunden warten..."
-sleep 30
+echo "45 Sekunden warten..."
+sleep 45
 echo "--------------------------------------------" >> nodes.txt
 sshpass ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@192.168.1.1 'ip address show eth0 | grep -Eo [:0-9a-f:]{2}\(\:[:0-9a-f:]{2}\){5}' >> nodes.txt
 echo "Schreibe SSH Key und Knoteninfos"
 cat public_rsa_key.pub | sshpass ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@192.168.1.1 'cat >> /etc/dropbear/authorized_keys'
-read -p "Bitte Knoten-Namen eingeben: " nodename
-read -p "Bitte Domaincode eingeben: " domaincode
-sshpass ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@192.168.1.1 'pretty-hostname "$nodename"'
+# read -p "Bitte Knoten-Namen eingeben: " nodename
+# read -p "Bitte Domaincode eingeben: " domaincode
+sshpass ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@192.168.1.1 'pretty-hostname FFBSU'
 sshpass ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@192.168.1.1 'uci set gluon-node-info.@owner[0].contact=info@freifunk-lippe.de'
 sshpass ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@192.168.1.1 'uci commit gluon-node-info'
-sshpass ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@192.168.1.1 'uci set gluon.core.domain="$domaincode"'
+sshpass ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@192.168.1.1 'uci set gluon.core.domain=d4low'
 sshpass ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@192.168.1.1 'uci commit'
 sshpass ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@192.168.1.1 'gluon-reconfigure'
 sshpass ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@192.168.1.1 'uci set gluon-setup-mode.@setup_mode[0].configured=1'
@@ -192,7 +193,7 @@ do
             flashacmeshpro
             ;;
         "Beenden")
-            break
+            exit
             ;;
         *) echo "invalid option $REPLY";;
     esac
